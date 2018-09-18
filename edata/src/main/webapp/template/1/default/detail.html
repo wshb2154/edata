@@ -1,0 +1,121 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+<title>阳泉电力--电厂详情</title>
+<link href="_files/yqbigdata/css/style.css" rel="stylesheet" type="text/css">
+<script type="text/javascript" src="_files/yqbigdata/js/jquery-1.9.1.min.js"></script>
+<script type="text/javascript" src="_files/yqbigdata/js/date_time.js"></script>
+<script type="text/javascript" src="_files/yqbigdata/js/webVideoCtrl.js"></script>
+<script type="text/javascript" src="_files/yqbigdata/js/haikang.js"></script>
+<script type="text/javascript" src="_files/yqbigdata/js/echarts.min.js"></script>
+<script type="text/javascript" src="_files/yqbigdata/js/echartsPersonal.js"></script>
+<script type="text/javascript" src="_files/yqbigdata/js/echart_options.js"></script>
+<style>
+.yqdl_detail_r pre {
+    font-size: 16px;
+    color: #4da1ff;
+    line-height: 57px;
+    margin: 15px 0;
+    white-space: pre-line;
+    font-family: inherit;
+}
+.yqdl_detail_r_new{
+	width:410px;
+	padding:10px 10px;
+}
+canvas {
+    height: 109%!important;
+    width: 102%!important;
+}
+</style>
+<script>
+$(function(){
+	showDate_time();
+	//2*2的分屏控件
+	buildVideoPlug("video",2);
+	//插入海康视频
+	var videos = ${videos};
+	if(videos.length>4) { // 只装载4个监视视频
+		alert("警告：发现"+videos.length+"个视频源。[最多只显示4个监控视频，请联系管理员。]");
+	}else{
+		$.each(videos,function(i,video){
+			new haikang(video["videoip"],video["videoport"],video["videoname"],video["videopassword"]).insetTo(i);
+		});
+	}
+	//日发电量、月发电量曲线图
+	var dayEle = processData(${dayEle}),monthEle = processData(${monthEle});
+	
+	new echartsPersonal("rqx",dayEle.concat("日发电量"),modifyChart).loadChart(fadloption);
+	new echartsPersonal("yqx",monthEle.concat("月发电量"),modifyChart).loadChart(fadloption);
+})
+function modifyChart(data){
+		var sj = data[0];
+		var fadl = data[1];
+		var name = data[2];
+		return {
+			xAxis:{
+				data:sj
+			},
+			series:[{
+				name:name,
+				data:fadl
+			}],
+		}
+}
+function processData(data){
+	var sj = [];
+	var fadl = [];
+	$.each(data,function(i,n){
+		sj.push(n['sj']);
+		fadl.push(n['fadl']);
+	})
+	return [sj.reverse(),fadl.reverse()];
+}
+</script>
+
+</head>
+
+<body>
+ <!-----头部 开始------>
+ <div class="header">
+   <h1>阳泉光伏基地信息监测平台</h1>
+   <div class="nav">
+     <ul>
+       <li ><a href="/index.html">首页</a></li>
+       <li ><a href="/zongh/page">综合显示</a></li>
+       <li ><a href="/jiank/lvsqs">数据平台</a></li>
+       <!-- <li ><a href="/jiank/page">监控信息</a></li> -->
+     </ul>
+   </div>
+   <div class="time"><span>14:55:40</span><p>2018年3月5日<br/>农历一月十八 星期一</p></div>
+ </div>
+ <!-----头部 结束------>
+ <!-----内容宽度自适应 开始------>
+ <div class="yqdl_cont yqdl_cont_p0">
+   <div class="yqdl_detail_r">
+     <h2 class="box">${station.name!}<i class="box_icon2"></i><i class="box_icon4"></i></h2>
+     <h3>电厂简介</h3>
+     <div class="dt_cont">
+       <pre>${station.brief!}</pre>
+       <img style="display:none" src="${station.imageurl!}">
+       <p style="display:none">位于山西省阳泉市平定县境内，距太原市和石家庄市各约120公里，距阳泉市区15公里，与太石高速公路紧紧相邻。是国家“八五”重点建设工程，总投资约55亿。工程总装机容量为4×300MW燃煤汽轮发电机组，工程于1993年12月25日开工建设，四台机组分别于1996年12月、1997年11月、1998年12月、1999年11月相继投产发电。</p>
+     </div>
+   </div>
+   
+   <div id="video" class="yqdl_detail_l_new">
+    <!--监控视频位置-->
+   </div>
+   
+   <!--曲线-->
+   <div class="yqdl_detail_r_new">
+     <h3>日发电量曲线（最近30天）</h3>
+     <div id="rqx" class="ri_qx"><!--插件位置--></div>
+     <h3>月发电量曲线（最近12月）</h3>
+     <div id="yqx" class="ri_qx"><!--插件位置--></div>
+   </div>
+ </div>
+ <!-----内容宽度自适应 结束------>
+</body>
+</html>
